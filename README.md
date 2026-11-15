@@ -13,6 +13,10 @@ alles prozedural, gebündelt in eine `index.html`), aber an Land – an der Süd
 
 ## Ausprobieren
 
+**Direkt im Browser spielen: [barrick89.github.io/BournemouthWalk](https://barrick89.github.io/BournemouthWalk/)**
+
+Oder offline:
+
 1. [`index.html`](index.html) herunterladen.
 2. In **Chrome** oder **Edge** auf einem Desktop-Rechner öffnen.
 3. Ein paar Sekunden warten, bis die Bucht aufgebaut ist, dann **Losgehen** drücken.
