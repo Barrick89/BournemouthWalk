@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang=de>
+<head>
+<meta charset=utf-8>
+<title>Bournemouth Walk</title>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<meta name=theme-color content=#0d3b52>
+<style>
+/* The class on <body> is the state of the page:
+   l = loading, m = menu, g = walking (g p while the mouse is captured), f = arrived, l e = failed to start */
+html { background: #0d3b52; }
+body {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%; margin: 0; overflow: hidden;
+  background: linear-gradient(#5fa8d3, #bfe3f2 55%, #e9d8b4 56%, #d8bf8f);
+  font: 700 clamp(13px, .7vw + .9vh, 34px)/1.4 system-ui, sans-serif; color: #fffdf6;
+  -webkit-user-select: none; user-select: none;
+}
+@media (orientation: portrait) and (pointer: coarse) {
+  body { width: 100dvh; height: 100dvw; transform-origin: 0 0; transform: rotate(90deg) translateY(-100%); }
+}
+canvas {
+  position: absolute; width: 100%; height: 100%; touch-action: none; cursor: crosshair;
+  transition: filter 1s, transform 1s, opacity 2s;
+}
+body:not(.g) canvas { filter: blur(.8vmax) brightness(.6); transform: scale(1.05); }
+.l canvas { opacity: 0; }
+
+#m {
+  position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: min(1.8em, 5vmin);
+  padding: 1em 1em 4.5em; text-align: center; background: radial-gradient(#0d3b5200 30%, #0d3b52bb);
+  transition: opacity .5s, visibility .5s;
+}
+.g #m, .m #l, .l #g { opacity: 0; visibility: hidden; }
+h1 {
+  margin: 0; font: 900 4.2em/1 system-ui, sans-serif; letter-spacing: .04em; text-transform: uppercase;
+  color: #0000; background: linear-gradient(#fff 30%, #ffe7a8 62%, #f2a65a);
+  -webkit-background-clip: text; background-clip: text; filter: drop-shadow(0 .06em .2em #0008);
+}
+#sub { margin-top: -.6em; font-size: .95em; letter-spacing: .04em; color: #e8f6ff; text-shadow: 0 1px 6px #0008; }
+p { margin: 0; }
+#a { display: grid; width: 29em; max-width: 100%; }
+#a > * { grid-area: 1/1; transition: opacity .8s, visibility .8s; }
+#s, #w, #q, #t, #k, #h { font-size: .8em; letter-spacing: .1em; text-transform: uppercase; }
+#w { margin-top: 1.2em; color: #ffe7a8; text-wrap: balance; }
+#p { height: .5em; margin: .4em 0 1em; overflow: hidden; border-radius: 1em; background: #0d3b52; box-shadow: 0 0 0 2px #ffe7a880, 0 0 1.5em #f2a65a; }
+#b { display: block; height: 100%; background: linear-gradient(90deg, #f2a65a, #ffe7a8); transform: scaleX(0); transform-origin: 0; will-change: transform; }
+.e #p { visibility: hidden; }
+.e #s { font-size: 1.1em; letter-spacing: 0; text-transform: none; }
+
+button, a {
+  display: flex; align-items: center; justify-content: center; gap: .6em; padding: .8em 1.4em; border: 0;
+  border-radius: .5em; background: #fff; box-shadow: inset 0 -.2em #0003, 0 .3em 1em #0007;
+  font: 800 1em/1.2 system-ui, sans-serif; letter-spacing: .1em; text-transform: uppercase; text-decoration: none;
+  color: #0d3b52; cursor: pointer; transition: transform .12s, filter .12s;
+}
+button:hover, a:hover { transform: translateY(-.12em); filter: brightness(1.1); }
+button:active, a:active { transform: translateY(.1em); filter: brightness(.9); }
+:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+#g { display: grid; gap: min(1em, 3vmin); }
+#d { padding: .9em; background: linear-gradient(#ffe7a8, #f2a65a); font-size: 1.3em; box-shadow: inset 0 -.2em #0003, 0 0 2em #f2a65aaa; }
+#f { position: absolute; left: 0; right: 0; bottom: 1.5em; display: flex; justify-content: center; font-size: .8em; }
+svg { width: 1.5em; height: 1.5em; fill: currentColor; }
+
+#q, #t, #k, #h { padding: 1em 1.6em; border-radius: .7em; background: #0d3b52b3; }
+#q, #t { display: flex; align-items: center; gap: .4em; padding: .4em; }
+#q span, #t span { flex: 1; color: #ffe7a8; }
+#q button, #t button { flex: 1.2; padding: .7em 0; background: none; box-shadow: none; color: #fffdf6; }
+#q button:hover, #t button:hover { background: #ffe7a833; }
+#q .on, #t .on { background: linear-gradient(#ffe7a8, #f2a65a); box-shadow: inset 0 -.2em #0003; color: #0d3b52; pointer-events: none; }
+#k { display: flex; justify-content: center; gap: 2em; text-align: left; }
+#k p { display: grid; grid-template-columns: auto auto; align-content: start; align-items: center; gap: .55em .9em; }
+#k p + p { padding-left: 2em; border-left: 2px solid #ffe7a840; }
+#k i { display: flex; justify-self: end; align-items: center; gap: .25em; font-style: normal; }
+#k b { min-width: 1.1em; padding: .2em .5em; border-radius: .35em; background: #fffdf6; box-shadow: inset 0 -.15em #0004; color: #0d3b52; text-align: center; }
+#h { display: none; }
+@media (pointer: coarse), (max-height: 30em) { #k { display: none; } }
+@media (pointer: coarse) { #h { display: block; } }
+
+/* walking: menu button, stats, place names, progress along the seafront */
+#o { position: absolute; top: .6em; right: .6em; display: none; padding: .3em .6em; background: #0d3b52d9; box-shadow: inset 0 0 0 2px #ffe7a8, 0 .3em 1em #0007; font-size: 1.3em; color: #fffdf6; opacity: .8; }
+.g #o { display: flex; }
+.p #o { display: none; }
+#i { position: absolute; top: 1em; left: 1.2em; margin: 0; font: .8em/1.6 ui-monospace, Consolas, monospace; white-space: pre-wrap; text-shadow: 0 1px 4px #000; pointer-events: none; }
+#poi {
+  position: absolute; top: 1.4em; left: 50%; width: min(30em, 80vw); padding: .8em 1.2em; border-radius: .7em;
+  background: #0d3b52c4; box-shadow: 0 .3em 1.5em #0006; text-align: center; pointer-events: none;
+  transform: translate(-50%, -1em); opacity: 0; transition: opacity .8s, transform .8s;
+}
+#poi.on { opacity: 1; transform: translate(-50%, 0); }
+body:not(.g) #poi { opacity: 0; }
+#pt { font-size: 1.25em; letter-spacing: .06em; text-transform: uppercase; color: #ffe7a8; }
+#pp { font-weight: 500; }
+#hud {
+  position: absolute; left: 50%; bottom: 1.2em; width: min(34em, 86vw); transform: translateX(-50%);
+  display: none; grid-template-columns: auto 1fr auto; align-items: center; gap: .3em .8em;
+  font-size: .75em; letter-spacing: .08em; text-transform: uppercase; text-shadow: 0 1px 4px #000c; pointer-events: none;
+}
+.g #hud { display: grid; }
+#tr { position: relative; height: .35em; border-radius: 1em; background: #fffdf655; box-shadow: 0 0 .6em #0006; }
+#dot { position: absolute; top: 50%; width: .9em; height: .9em; border-radius: 50%; background: #f2a65a; box-shadow: 0 0 0 .2em #fffdf6, 0 0 .8em #000a; transform: translate(-50%, -50%); }
+#rem { grid-column: 1 / -1; text-align: center; color: #ffe7a8; }
+#fin {
+  position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 1em; text-align: center;
+  background: radial-gradient(#0d3b5233, #0d3b52dd); opacity: 0; visibility: hidden; transition: opacity 1s, visibility 1s;
+}
+.f #fin { opacity: 1; visibility: visible; }
+#fin h2 { margin: 0; font: 900 3.4em/1 system-ui, sans-serif; text-transform: uppercase; color: #ffe7a8; filter: drop-shadow(0 .06em .2em #0008); }
+#ft { font-size: 1.2em; }
+</style>
+</head>
+<body class=l>
+<canvas id=c></canvas>
+<div id=poi><p id=pt></p><p id=pp></p></div>
+<div id=hud><span>Bournemouth Pier</span><div id=tr><i id=dot></i></div><span>Boscombe Pier</span><p id=rem></p></div>
+<div id=m>
+  <h1>Bournemouth Walk</h1>
+  <p id=sub>Ein Spaziergang an der Promenade von Bournemouth Pier nach Boscombe Pier</p>
+  <div id=a>
+    <div id=l><div id=p><i id=b></i></div><p id=s>Packe die Badesachen…</p><p id=w hidden>Am besten in Google Chrome oder Microsoft Edge</p></div>
+    <div id=g>
+      <button id=d>Losgehen</button>
+      <p id=t><span>Tageszeit</span><button>Morgen</button><button>Mittag</button><button>Abend</button></p>
+      <p id=q><span>Details</span><button>Niedrig</button><button>Mittel</button><button>Hoch</button></p>
+      <div id=k>
+        <p>
+          <i><b>W</b><b>A</b><b>S</b><b>D</b></i>Gehen
+          <i><b>Maus</b></i>Umsehen
+          <i><b>Shift</b></i>Laufen
+          <i><b>Leertaste</b></i>Springen
+        </p>
+        <p>
+          <i><b>T</b></i>Tageszeit
+          <i><b>1</b>–<b>5</b></i>Aussichtspunkte
+          <i><b>M</b></i>Ton aus
+          <i><b>Esc</b></i>Menü
+        </p>
+      </div>
+      <p id=h>Finger halten zum Gehen · wischen zum Umsehen · zweiter Finger zum Laufen</p>
+    </div>
+  </div>
+  <p id=f>
+    <a href=https://github.com/Barrick89/BournemouthWalk target=_blank><svg viewBox="0 0 16 16"><path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"/></svg>GitHub</a>
+  </p>
+</div>
+<div id=fin>
+  <h2>Geschafft!</h2>
+  <p>Von Bournemouth Pier bis Boscombe Pier</p>
+  <p id=ft></p>
+  <button id=fb>Weiter erkunden</button>
+</div>
+<button id=o aria-label=Menü>≡</button>
+<pre id=i></pre>
+<script>
+/*SCRIPT*/
+</script>
+</body>
+</html>
