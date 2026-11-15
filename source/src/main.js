@@ -127,9 +127,9 @@ resize();
 // ---------------------------------------------------------------- time of day
 // sun direction, sun colour, zenith, horizon, cloud cover, haze, ground bounce, exposure, evening
 const TOD = [
-  [0.72, 0.3, -0.62, 2.7, 2.25, 1.75, 0.2, 0.36, 0.7, 0.86, 0.8, 0.74, 0.32, 1.1e-4, 0.24, 0.21, 0.17, 1.0, 0],
-  [0.18, 0.86, -0.48, 3.0, 2.9, 2.72, 0.17, 0.37, 0.8, 0.68, 0.8, 0.92, 0.26, 7e-5, 0.26, 0.24, 0.19, 0.9, 0],
-  [-0.83, 0.075, -0.55, 2.9, 1.35, 0.55, 0.15, 0.22, 0.46, 0.98, 0.6, 0.4, 0.42, 9e-5, 0.2, 0.15, 0.12, 1.15, 1],
+  [0.72, 0.3, -0.62, 1.75, 1.42, 1.08, 0.16, 0.3, 0.62, 0.72, 0.66, 0.62, 0.32, 8e-5, 0.16, 0.14, 0.11, 1.0, 0],
+  [0.18, 0.86, -0.48, 1.8, 1.72, 1.6, 0.11, 0.27, 0.66, 0.5, 0.64, 0.8, 0.26, 5e-5, 0.17, 0.15, 0.12, 0.95, 0],
+  [-0.83, 0.075, -0.55, 1.9, 0.85, 0.36, 0.1, 0.15, 0.34, 0.85, 0.48, 0.3, 0.42, 7e-5, 0.13, 0.1, 0.08, 1.1, 1],
 ];
 const TODN = ['Morgen', 'Mittag', 'Abend'];
 let tod = 1;
@@ -398,6 +398,7 @@ $('t').querySelectorAll('button').forEach((b, i) => { b.onclick = () => setTod(i
 setTod(tod);
 document.addEventListener('pointerlockchange', () => { if (!body.classList.contains('f')) ui(!document.pointerLockElement); });
 
+window.__bw = () => ({ px, pz, feet, eyeY, yaw, pitch, W, H, SCALE }); // for testing
 // first frame, then the reveal
 teleport(0); shortcut = false;
 await say('Die Sonne kommt raus…', 1, 400);
