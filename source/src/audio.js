@@ -46,11 +46,11 @@ function mkSound(ac) {
   return () => {
     const t = ac.currentTime + 0.05;
     // the wash: same phase as swash() in the sea shader
-    const ph = TIME * 0.75 + px * 0.011, rise = cos(ph), prox = 1 / (1 + abs(pz + 46) / 20) * (feet > 3.5 ? 0.75 : 1);
+    const ph = TIME * 0.75 + px * 0.011, rise = cos(ph), prox = 1 / (1 + abs(shoreDist) / 20) * (feet > 5 ? 0.75 : 1);
     const k = max(rise, 0) ** 2;
     surf.gain.setTargetAtTime(prox * (0.12 + 0.55 * k), t, 0.35);
     hiss.gain.setTargetAtTime(prox * (0.015 + 0.09 * max(sin(ph - 0.6), 0) ** 3), t, 0.25);
-    wind.gain.setTargetAtTime(0.04 + clamp((feet - 2) / 30, 0, 1) * 0.12 + (pz < -60 ? 0.05 : 0), t, 1);
+    wind.gain.setTargetAtTime(0.04 + clamp((feet - 2) / 30, 0, 1) * 0.12 + (shoreDist < -25 ? 0.05 : 0), t, 1);
     if (t > tG) {
       // a call of 2-5 falling "kyow" notes, sometimes a laugh of short ones
       const v = gull[gi++ % 3], fast = rnd() < 0.35, n = 2 + rnd() * 4 | 0, base = rr(1000, 1500), vol = rr(0.015, 0.05);
