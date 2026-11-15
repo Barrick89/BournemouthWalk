@@ -257,7 +257,12 @@ fn top(l: u32, p: vec3f, s: f32) -> Mt { let uv = p.xz / (MSIZE[l] * s); var m: 
   var l = 4u; var tint = vec3f(1.0); var bumpK = 0.6; var rough = 1.0; var wet = 0.0;
   switch cls {
     case 1u: { l = 0u; }
-    case 2u, 4u: { l = 1u; }
+    case 2u: {
+      // Undercliff Drive: tarmac down the middle, paving along the edges
+      let e = maskAt(p.xz + vec2f(3.5, 0.0)) == 2u && maskAt(p.xz - vec2f(3.5, 0.0)) == 2u && maskAt(p.xz + vec2f(0.0, 3.5)) == 2u && maskAt(p.xz - vec2f(0.0, 3.5)) == 2u;
+      l = select(1u, 2u, e); tint = select(vec3f(1.0), vec3f(1.5, 1.4, 1.35), e);
+    }
+    case 4u: { l = 1u; }
     case 3u: { l = 2u; }
     case 5u: { l = 4u; }
     case 6u: { l = 7u; }

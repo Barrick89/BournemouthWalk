@@ -61,12 +61,12 @@ fn mat(l: u32, uv: vec2f) -> M {
   switch l {
     case 0u: { // sand: fine grain, wind ripples, a few shell fragments and dark grains
       let g = fbm(uv, vec2f(48.0), 3, 1u); let big = fbm(uv, vec2f(3.0), 3, 2u);
-      let rip = sin((uv.y * 9.0 + fbm(uv, vec2f(2.0), 3, 3u) * 2.2) * 6.2832);
+      let rip = sin((uv.y * 7.0 + uv.x * 2.0 + fbm(uv, vec2f(3.0), 4, 3u) * 3.5) * 6.2832) * smoothstep(0.35, 0.7, fbm(uv, vec2f(2.0), 3, 5u));
       let sp = ih(vec2i(uv * 300.0), 4u);
       m.c = mix(vec3f(0.46, 0.36, 0.24), vec3f(0.6, 0.49, 0.35), big) * (0.88 + 0.22 * g);
       m.c = select(m.c, m.c * vec3f(0.55, 0.5, 0.48), sp > 0.985);
       m.c = select(m.c, vec3f(0.86, 0.82, 0.74), sp < 0.006);
-      m.h = rip * 0.35 + g * 0.6; m.r = 0.93;
+      m.h = rip * 0.12 + g * 0.6; m.r = 0.93;
     }
     case 1u: { // promenade paving: 0.6 m slabs (6 x 6 per tile), weathered
       let q = uv * 6.0; let cell = floor(q); let f = fract(q); let e = min(min(f.x, 1.0 - f.x), min(f.y, 1.0 - f.y));

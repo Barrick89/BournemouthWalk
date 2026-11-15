@@ -204,7 +204,8 @@ function blocked(x, z, f, d) {
   if (x < -2100 || x > 4300 || z < -1250 || z > 1450) return true;
   const g = groundAt(x, z, f);
   if (!standOn && g < LEVEL - 0.85) return true; // no swimming
-  if (!standOn && g > f + 0.03 && g - f > d * 0.9 + 0.02) return true; // too steep (about 42 degrees)
+  // too steep: about 33 degrees, 45 on mapped paths and steps (the zigzags up the cliffs)
+  if (!standOn && g > f + 0.03) { const c = maskAt(x, z); if (g - f > d * (c === 4 || c === 10 || c === 2 || c === 3 ? 1.0 : 0.65) + 0.02) return true; }
   if (standOn && g > f + STEP) return true;
   const k0 = floor((x - RAD) / 8), k1 = floor((x + RAD) / 8), j0 = floor((z - RAD) / 8), j1 = floor((z + RAD) / 8);
   for (let kx = k0; kx <= k1; kx++) for (let kz = j0; kz <= j1; kz++) {

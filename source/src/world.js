@@ -417,10 +417,16 @@ function grassMesh() { const m = new Mesh(); for (let i = 0; i < 2; i++) { const
 // people: parts coded in colour alpha (40 head, 41 torso, 42/43 legs, 44/45 arms, 46 hair); facing +x
 function personMesh() {
   const m = new Mesh(), k = (p) => col(1, 1, 1, p);
-  m.boxA([0, 0.46, 0.09], [0.07, 0, 0], [0, 0.46, 0], [0, 0, 0.07], k(42)); m.boxA([0, 0.46, -0.09], [0.07, 0, 0], [0, 0.46, 0], [0, 0, 0.07], k(43));
-  m.boxA([0.01, 1.17, 0], [0.12, 0, 0], [0, 0.32, 0], [0, 0, 0.19], k(41));
-  m.boxA([0, 1.14, 0.25], [0.05, 0, 0], [0, 0.31, 0], [0, 0, 0.05], k(44)); m.boxA([0, 1.14, -0.25], [0.05, 0, 0], [0, 0.31, 0], [0, 0, 0.05], k(45));
-  m.blob(0.01, 1.62, 0, 0.1, 0.12, 0.095, k(40), E0, 0.02, 1); m.blob(-0.01, 1.69, 0, 0.105, 0.075, 0.1, k(46), E0, 0.05, 1);
+  for (const [z, p] of [[0.09, 42], [-0.09, 43]]) {
+    m.ecyl(0, 0.08, z, 0.055, 0.05, 0.085, 0.075, 0.84, 7, k(p));                // leg, widening to the hip
+    m.boxA([0.04, 0.04, z], [0.13, 0, 0], [0, 0.04, 0], [0, 0, 0.055], k(p));      // shoe
+  }
+  m.ecyl(0, 0.88, 0, 0.12, 0.17, 0.13, 0.2, 0.28, 9, k(41));                       // hips to chest
+  m.ecyl(0, 1.16, 0, 0.13, 0.2, 0.1, 0.21, 0.3, 9, k(41));                         // chest to shoulders
+  for (const [z, p] of [[0.245, 44], [-0.245, 45]]) m.ecyl(0, 0.82, z, 0.04, 0.04, 0.052, 0.052, 0.62, 6, k(p)); // arms
+  m.ecyl(0, 1.45, 0, 0.045, 0.045, 0.045, 0.045, 0.1, 6, k(40));                  // neck
+  m.blob(0.01, 1.63, 0, 0.095, 0.115, 0.09, k(40), E0, 0.01, 2);                   // head
+  m.blob(-0.015, 1.68, 0, 0.1, 0.08, 0.095, k(46), E0, 0.04, 2);                   // hair
   return m;
 }
 function gullMesh() {
@@ -595,7 +601,7 @@ function initPlaces() {
   const bh = far(BP), sh = far(SP), zp = promPoint(plProject(COAST, zz[1], zz[2]));
   const yawTo = (fx, fz) => atan2(fx, -fz); // forward = (sin yaw, -cos yaw), see main.js
   POSES = [
-    [st[0], st[1], yawTo(st[2], st[3]) + 0.35, -0.02],
+    [st[0], st[1], yawTo(st[2], st[3]) - 0.3, -0.02],
     [bh[0] + (BP.root[0] - bh[0]) * 0.04, bh[1] + (BP.root[1] - bh[1]) * 0.04, yawTo(BP.root[0] - bh[0], BP.root[1] - bh[1]), 0.02],
     [zp[0], zp[1], yawTo(zz[1] - zp[0], zz[2] - zp[1]), 0.18],
     [mid[0] + mn[0] * 12, mid[1] + mn[1] * 12, yawTo(mid[2], mid[3]), -0.03],

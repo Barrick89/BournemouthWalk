@@ -97,6 +97,15 @@ class Mesh {
       if (cap) this.tri([x, y + h, z], p[3], p[2], k, e);
     }
   }
+  // vertical cylinder with an elliptical section (radii rx along x, rz along z at the bottom and top), smooth
+  ecyl(x, y, z, rx0, rz0, rx1, rz1, h, seg, k, e) {
+    for (let i = 0; i < seg; i++) {
+      const a0 = i / seg * TAU, a1 = (i + 1) / seg * TAU, c0 = cos(a0), s0 = sin(a0), c1 = cos(a1), s1 = sin(a1);
+      const p = [[x + c0 * rx0, y, z + s0 * rz0], [x + c1 * rx0, y, z + s1 * rz0], [x + c1 * rx1, y + h, z + s1 * rz1], [x + c0 * rx1, y + h, z + s0 * rz1]];
+      const n0 = [c0 / rx0, 0, s0 / rz0], n1 = [c1 / rx0, 0, s1 / rz0], nm = [(n0[0] + n1[0]) / 2, 0, (n0[2] + n1[2]) / 2];
+      this.tri(p[0], p[1], p[2], k, e, undefined, nm); this.tri(p[0], p[2], p[3], k, e, undefined, nm);
+    }
+  }
   // flat polygon (ring of [x, z], counter-clockwise seen from above) at height y, facing up (or down)
   poly(ring, y, k, e, down) {
     for (const [i, j, l] of earcut(ring)) { const a = [ring[i][0], y, ring[i][1]], b = [ring[j][0], y, ring[j][1]], c = [ring[l][0], y, ring[l][1]]; if (down) this.tri(a, b, c, k, e); else this.tri(a, c, b, k, e); }
