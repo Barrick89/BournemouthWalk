@@ -130,7 +130,7 @@ function kiosk(x, z, w) {
 
 // a pier: deck height follows `deck(z)`, `w(z)` is its half width
 function pier(px, len, deck, w, rail, pile) {
-  const step = 3, wood = hex(0x8c7a64, M.WOOD), iron = hex(0x4a5258, M.METAL);
+  const step = 3, wood = hex(0x6f5c48, M.WOOD), iron = hex(0x4a5258, M.METAL);
   for (let z = 0; z > -len; z -= step) {
     const z1 = z - step, a = deck(z), b = deck(z1), hw = w(z - step / 2);
     S.quad([px - hw, a, z], [px + hw, a, z], [px + hw, b, z1], [px - hw, b, z1], wood);
@@ -244,7 +244,8 @@ function buildScenery() {
   }
   // pavilion on the head
   {
-    const y = 4.6, wc = hex(0xf0e9da, M.BLDG);
+    const y = 4.6, wc = hex(0xf0e9da, M.HUT);
+    S.box(-13.05, y + 1, -292, 13.05, y + 3.4, -247, hex(0x2a3b46, M.GLASS), true);
     S.box(-13, y, -293, 13, y + 7.5, -246, wc, true);
     S.hip(-13, -293, 13, -246, y + 7.5, 5, hex(0x4f7c74, M.ROOF));
     S.box(-4, y + 7.5, -272, 4, y + 15, -266, wc);
@@ -399,7 +400,7 @@ function buildFar() {
 function buildPlants() {
   rseed(4);
   const pines = [], bushes = [];
-  const NP = 3200 * DENS | 0, NBu = 14000 * DENS | 0;
+  const NP = 2800 * DENS | 0, NBu = 22000 * DENS | 0;
   for (let i = 0, t = 0; i < NP && t < NP * 8; t++) {
     const x = rnd() < 0.75 ? rr(-500, 2100) : rr(-3500, 5500), W = cliffW(x), vf = valleyF(x);
     const z = PW + rr(0.15 + vf * 0.4, 1) * (W + 160 + vf * 150);
@@ -415,7 +416,7 @@ function buildPlants() {
     const z = PW + 0.6 + rr(0, 1) ** 0.8 * (W + 40);
     if (nearBld(x, z, 1) || (abs(x - 520) < 4.5 && z < cliffTop(520) + 4) || (x > 1500 && x < 1574 && z < 24)) continue;
     i++;
-    bushes.push(x, ground(x, z) - 0.15, z + bend(x), rr(0.8, 2.6), rr(0, TAU), rnd(), rr(0.5, 0.8), 1);
+    bushes.push(x, ground(x, z) - 0.25, z + bend(x), rr(0.7, 2.2), rr(0, TAU), rnd(), rr(0.5, 0.8), 1);
   }
   return { pines: new Float32Array(pines), bushes: new Float32Array(bushes) };
 }
@@ -475,14 +476,14 @@ function boatMesh() {
 // a Scots pine: tall bare trunk, a flat, broken crown
 function pineMesh() {
   const m = new Mesh(false), tr = col(0.42, 0.27, 0.18, 0), lf = col(1, 1, 1, 1);
-  m.cyl(0, 0, 0, 0.03, 0.016, 0.82, 6, tr, false);
+  m.cyl(0, 0, 0, 0.028, 0.014, 0.8, 6, tr, false);
   rseed(8);
-  for (let i = 0; i < 4; i++) {
-    const a = i / 4 * TAU + rr(-0.4, 0.4), r = rr(0.07, 0.15), y = rr(0.66, 0.86), x = cos(a) * r, z = sin(a) * r;
-    m.beam([0, y - 0.08, 0], [x, y, z], 0.008, tr);
-    m.blob(x, y + 0.02, z, rr(0.1, 0.15), rr(0.05, 0.07), rr(0.1, 0.15), lf, 0.25, 1);
+  for (let i = 0; i < 7; i++) {
+    const a = i / 7 * TAU + rr(-0.3, 0.3), r = rr(0.1, 0.24), y = rr(0.52, 0.82), x = cos(a) * r, z = sin(a) * r;
+    m.beam([0, y - 0.1, 0], [x * 0.8, y, z * 0.8], 0.007, tr);
+    m.blob(x, y + 0.03, z, rr(0.13, 0.2), rr(0.06, 0.09), rr(0.13, 0.2), lf, 0.3, 1);
   }
-  m.blob(0, 0.9, 0, 0.13, 0.06, 0.13, lf, 0.25, 1);
+  m.blob(0, 0.86, 0, 0.18, 0.08, 0.18, lf, 0.3, 1);
   return m.pack();
 }
 function bushMesh() { const m = new Mesh(false); m.blob(0, 0.35, 0, 0.6, 0.55, 0.6, col(1, 1, 1, 1), 0.28, 1); return m.pack(); }

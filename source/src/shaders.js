@@ -49,7 +49,7 @@ fn skyFull(d: vec3f) -> vec3f {
     let cov = u.zen.w;
     let a = smoothstep(1.0 - cov, 1.1 - cov + 0.25, n) * smoothstep(0.0, 0.15, d.y);
     let lit = 0.55 + 0.45 * smoothstep(0.4, 0.9, fbm(q * 2.7 + 9.0 + u.sun.xz * 0.6));
-    let cc = (u.sunC.rgb * 0.32 * lit + u.zen.rgb * 0.55 + u.hor.rgb * 0.2) * mix(1.0, 0.72, smoothstep(0.65, 1.0, n));
+    let cc = (u.sunC.rgb * 0.55 * lit + u.zen.rgb * 0.45 + u.hor.rgb * 0.35) * mix(1.0, 0.72, smoothstep(0.65, 1.0, n));
     c = mix(c, cc + u.sunC.rgb * 0.25 * pow(max(s, 0.0), 12.0), a * 0.92);
   }
   return c;
@@ -75,7 +75,7 @@ fn lit(b: vec3f, n: vec3f, p: vec3f, spec: f32, shin: f32, wrap: f32) -> vec3f {
   let L = u.sun.xyz;
   let sh = shadow(p, n);
   let ndl = clamp((dot(n, L) + wrap) / (1.0 + wrap), 0.0, 1.0) * sh;
-  let amb = mix(u.gnd.rgb, u.zen.rgb * 0.8 + u.hor.rgb * 0.25, n.y * 0.5 + 0.5);
+  let amb = mix(u.gnd.rgb, u.zen.rgb * 0.45 + u.hor.rgb * 0.12, n.y * 0.5 + 0.5);
   var c = b * (u.sunC.rgb * ndl + amb);
   if (spec > 0.0) {
     let V = normalize(u.cam.xyz - p); let H = normalize(L + V);
@@ -112,7 +112,7 @@ struct O { @builtin(position) pos: vec4f, @location(0) wp: vec3f, @location(1) n
   let n1 = fbm(p.xz * 0.06);
   let f1 = vn(p.xz * 5.0); let f2 = vn(p.xz * 19.0);
   var b: vec3f; var spec = 0.0; var shin = 40.0;
-  let sand = mix(vec3f(0.80, 0.67, 0.49), vec3f(0.89, 0.79, 0.62), n1) * (1.0 + ((f1 - 0.5) * 0.14 + (f2 - 0.5) * 0.1) * df);
+  let sand = mix(vec3f(0.6, 0.47, 0.31), vec3f(0.7, 0.58, 0.41), n1) * (1.0 + ((f1 - 0.5) * 0.14 + (f2 - 0.5) * 0.1) * df);
   if (z < -0.01 || p.y < 0.6) {
     b = sand;
     // wind ripples on the dry sand, a damp band where the waves reach
@@ -125,9 +125,9 @@ struct O { @builtin(position) pos: vec4f, @location(0) wp: vec3f, @location(1) n
     // promenade: concrete slabs, a red cycle lane
     let g = vec2f(p.x, z) / vec2f(1.8, 1.2);
     let f = fract(g); let e = min(min(f.x, 1.0 - f.x) * 1.8, min(f.y, 1.0 - f.y) * 1.2);
-    b = vec3f(0.66, 0.635, 0.6) * (0.92 + 0.1 * h21(floor(g))) * (0.95 + 0.07 * f1 * df);
+    b = vec3f(0.5, 0.48, 0.45) * (0.92 + 0.1 * h21(floor(g))) * (0.95 + 0.07 * f1 * df);
     if (z > 6.3 && z < 8.9) {
-      b = vec3f(0.52, 0.27, 0.22) * (0.92 + 0.08 * f2 * df);
+      b = vec3f(0.42, 0.2, 0.16) * (0.92 + 0.08 * f2 * df);
       let dash = step(0.5, fract(p.x / 3.0));
       let line = 1.0 - smoothstep(0.05, 0.08, abs(z - 7.6));
       b = mix(b, vec3f(0.9), line * dash * df);
@@ -137,13 +137,13 @@ struct O { @builtin(position) pos: vec4f, @location(0) wp: vec3f, @location(1) n
   } else {
     // cliffs: gorse, heather and pines on the slope, bare sandstone where it is steep, grass on the top
     let slope = 1.0 - n.y;
-    let veg = mix(vec3f(0.15, 0.23, 0.09), vec3f(0.31, 0.34, 0.14), n1) * (0.85 + 0.3 * f1 * df);
+    let veg = mix(vec3f(0.07, 0.12, 0.04), vec3f(0.2, 0.22, 0.08), n1) * (0.75 + 0.5 * vn(p.xz * 0.9) * (0.5 + 0.5 * df));
     let band = vn(vec2f(p.x * 0.05, p.y * 1.3)) * 0.6 + vn(vec2f(p.x * 0.3, p.y * 6.0)) * 0.4;
-    let st = mix(vec3f(0.86, 0.62, 0.39), vec3f(0.74, 0.46, 0.27), band) * (0.9 + 0.12 * f2 * df);
-    let ex = smoothstep(0.42, 0.62, slope + (fbm(p.xz * 0.045 + 7.0) - 0.5) * 0.8);
+    let st = mix(vec3f(0.72, 0.5, 0.3), vec3f(0.58, 0.34, 0.19), band) * (0.9 + 0.12 * f2 * df);
+    let ex = smoothstep(0.24, 0.4, slope + (fbm(p.xz * 0.045 + 7.0) - 0.5) * 0.9);
     b = mix(veg, st, ex);
-    let grass = mix(vec3f(0.22, 0.36, 0.11), vec3f(0.36, 0.45, 0.17), n1) * (0.9 + 0.2 * f1 * df);
-    b = mix(b, grass, smoothstep(0.2, 0.08, slope) * smoothstep(PROM + 1.5, PROM + 3.0, p.y));
+    let grass = mix(vec3f(0.14, 0.25, 0.07), vec3f(0.26, 0.33, 0.11), n1) * (0.9 + 0.2 * f1 * df);
+    b = mix(b, grass, smoothstep(0.07, 0.025, slope) * smoothstep(PROM + 1.5, PROM + 3.0, p.y));
   }
   return vec4f(fog(lit(b, n, p, spec, shin, 0.0), p), 1.0);
 }
@@ -318,7 +318,7 @@ fn swash(x: f32, t: f32, depth: f32) -> f32 {
   let R = reflect(-V, n);
   let refl = skyFull(vec3f(R.x, max(R.y, 0.01), R.z));
   let deep = vec3f(0.012, 0.075, 0.1); let shallow = vec3f(0.07, 0.3, 0.28);
-  let body = mix(shallow, deep, smoothstep(0.4, 9.0, wd)) * (u.sunC.rgb * max(u.sun.y, 0.05) * 0.5 + u.zen.rgb * 0.6);
+  let body = mix(shallow, deep, smoothstep(0.4, 9.0, wd)) * (u.sunC.rgb * max(u.sun.y, 0.05) * 0.5 + u.zen.rgb * 0.35);
   var c = mix(body, refl, fres);
   let H = normalize(u.sun.xyz + V);
   let sh = shadow(p, vec3f(0.0, 1.0, 0.0));
