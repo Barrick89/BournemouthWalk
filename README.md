@@ -6,6 +6,8 @@ Sandstrand, bunte Strandhütten, hölzerne Buhnen, Kiefern auf den Klippen, Möw
 die den Sand hinaufläuft. Alles entsteht aus Code: keine Bilder, keine 3D-Modelle, keine Sounddateien.
 Die ganze Küste passt in **eine einzige HTML-Datei von rund 60 kB**.
 
+![Die Promenade am Bournemouth Pier zur Mittagszeit](.github/screenshots/promenade.jpg)
+
 Inspiriert von [Abyssal Garden](https://github.com/Noniv/abyssal-garden): gleiche Bauweise (reines WebGPU, keine Engine,
 alles prozedural, gebündelt in eine `index.html`), aber an Land – an der Südküste Englands.
 
@@ -33,6 +35,12 @@ Der Weg ist rund **1,6 km** lang und folgt der Promenade (Undercliff Drive) nach
 - In der Ferne: **Old Harry Rocks** und die Purbeck Hills im Südwesten, die **Isle of Wight** mit den Needles im Südosten, Hengistbury Head im Osten
 - Drei Tageszeiten: **Morgen**, **Mittag** und **Abend** mit Sonnenuntergang über Purbeck, leuchtenden Laternen und Fenstern
 - Eine Geräuschkulisse, die live entsteht: Brandung im Rhythmus der sichtbaren Wellen, Wind, Möwenrufe und Schritte, die auf Sand, Beton, Holz und Gras unterschiedlich klingen
+
+| | |
+|---|---|
+| ![Strand und Strandhütten unter den Klippen](.github/screenshots/beach.jpg) | ![Abends auf dem Bournemouth Pier](.github/screenshots/pier-evening.jpg) |
+
+![Abendstimmung an der Promenade](.github/screenshots/evening.jpg)
 
 Unten zeigt eine Leiste, wie weit es noch bis Boscombe Pier ist. Wer ankommt, bekommt Zeit und Strecke angezeigt.
 

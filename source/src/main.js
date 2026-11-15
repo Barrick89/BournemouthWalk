@@ -363,7 +363,12 @@ addEventListener('keyup', (e) => key(e, 0));
 const release = () => { kf = kb = kl = kr = ks = kj = 0; tId = -1; tN = 0; };
 const capture = () => { sound(); const p = canvas.requestPointerLock({ unadjustedMovement: true }); if (p && p.catch) p.catch(() => canvas.requestPointerLock()).catch(() => 0); };
 canvas.addEventListener('click', () => { if (!menu && !mob) capture(); });
-addEventListener('mousemove', (e) => { if (document.pointerLockElement === canvas) { mdx += e.movementX; mdy += e.movementY; } });
+// Chrome can report one huge jump right after the mouse is captured: skip the first moments and any absurd jumps
+let lockT = 0;
+addEventListener('mousemove', (e) => {
+  if (document.pointerLockElement !== canvas || performance.now() - lockT < 150 || abs(e.movementX) > 400 || abs(e.movementY) > 400) return;
+  mdx += e.movementX; mdy += e.movementY;
+});
 addEventListener('blur', release);
 const touch = (e) => {
   e.preventDefault(); if (menu) return; sound(); tN = e.touches.length;
@@ -396,7 +401,7 @@ $('fb').onclick = () => { body.classList.remove('f'); if (!mob) capture(); };
 $('q').querySelectorAll('button').forEach((b, i) => { if (i === 2 - LV) b.className = 'on'; else b.onclick = () => { keep('bwalk', 2 - i); location.reload(); }; });
 $('t').querySelectorAll('button').forEach((b, i) => { b.onclick = () => setTod(i); });
 setTod(tod);
-document.addEventListener('pointerlockchange', () => { if (!body.classList.contains('f')) ui(!document.pointerLockElement); });
+document.addEventListener('pointerlockchange', () => { lockT = performance.now(); mdx = mdy = 0; if (!body.classList.contains('f')) ui(!document.pointerLockElement); });
 
 window.__bw = () => ({ px, pz, feet, eyeY, yaw, pitch, W, H, SCALE }); // for testing
 // first frame, then the reveal
